@@ -1,0 +1,5 @@
+WebStorm的v-bind报错
+Settings-->Editor-->Inspections-->XML-->Unbound XML namespace prefix
+
+学习路线
+官网教程：cn.vuejs.org

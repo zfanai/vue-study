@@ -1,0 +1,104 @@
+<html>
+<head>
+    <meta charset="utf8" />
+    <script type="text/javascript" src="vue.js"></script>
+</head>
+<body>
+
+<div id="example">
+    <my-component></my-component>
+</div>
+
+<script type="text/javascript">
+    // 全局注册， 也可以在Vue实例局部注册。
+    //Vue.component('my-component', {
+    //    template:'<div>A custom component!</div>'
+    //});
+
+    var app=new Vue({
+        el:'#example',
+        components:{
+            'my-component':{
+                template:'<div>A custom local component!</div>'
+            }
+        }
+    })
+
+</script>
+<hr/>
+
+<!--
+<table>标签里面只能是tr标签， 不能自定义标签名， 只能通过is属性来自定义标签功能。
+-->
+
+<!--
+组件的data属性必须是函数， 否则多个组件就会共用一个变量。
+-->
+
+<div id="example-2">
+    <simple-component></simple-component>
+    <simple-component></simple-component>
+    <simple-component></simple-component>
+</div>
+
+<script type="text/javascript">
+    var data={counter:6};
+    Vue.component('simple-component', {
+        template:'<button v-on:click="counter += 1">{{counter}}</button>',
+        data:function(){   // 这个属性只会在初始化的时候调用一次。
+            //return data;   // 多个组件使用同一个数据，会互相影响，没有相互独立。
+            console.info('data start');
+            return {
+                counter:0
+            }
+        }
+
+    })
+    new Vue({
+        el:'#example-2'
+    })
+</script>
+<hr/>
+
+<!--
+ 父子组件通信的总结：
+ props down, events up
+ -->
+
+<!--
+v-bind:message2="a"
+-->
+<div id="example-3">
+<!--<child v-for="f in fruits" v-bind:message="f"></child> -->
+    <child v-bind:message="f" message2="minus"></child>    <!-- 用变量申明一个组件 -->
+    <child message="pear" message2="add"></child>   <!-- 用常量申明一个组件 -->   <!-- message是协议接口 -->
+    <!-- 用常量传递的是字符串，如果想传递数值，使用动态变量传递属性 -->
+</div>
+
+<script type="text/javascript">
+    Vue.component('child', {
+        props:['message', ],
+        template:'<span>{{message}}{{a}}</span>',
+        data:function(){
+            return {a:2}
+        }
+    })
+    new Vue({
+        el:'#example-3',
+        data: {
+            f:'apple',
+            fruits: [
+                //{name: 'apple'}
+                'apple'
+            ]
+        }
+    })
+</script>
+<hr/>
+
+<!-- 子组件通过事件来通知父组件内部状态的变化。 -->
+
+
+
+</body>
+</html>

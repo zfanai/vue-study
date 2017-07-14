@@ -1,0 +1,173 @@
+<html>
+<head>
+    <meta charset="utf8" />
+    <script type="text/javascript" src="vue.js"></script>
+</head>
+<body>
+
+<!-- vue用法：
+ 1. new Vue({
+ })
+ el属性指定元素的选择器， 表示选择元素应用vue功能。
+ data 表示选择的元素内可以使用的环境变量。  可以通过{{ }}模板语法引用变量。 这种模板的语法风格叫做mustache模板, 有官网的。
+
+ -->
+<div id="app">
+    {{ message }} to {{v}}
+</div>
+<script type="text/javascript">
+    var app = new Vue({
+        el: '#app',
+        data: {
+            message: 'Hello Vue!',
+            v:2
+        }
+    })
+</script>
+<hr/>
+
+
+<!--
+在vue的控制域内， 不是简单的模板里面的数据求值。 模板数据求值只发生在元素文本里面。
+如果元素的属性要要vue的环境变量， 要使用v-bind指令。
+ -->
+<div id="app-2">
+  <span v-bind:title2="message" title='{{v}}'>
+    鼠标悬停几秒钟查看此处动态绑定的提示信息！{{v}}
+  </span>
+</div>
+
+<script>
+    var app2 = new Vue({
+        el: '#app-2',
+        data: {
+            message: '页面加载于 ' + new Date(),
+            v:'另一种用法'
+        }
+    })
+</script>
+<hr/>
+
+
+<!-- v-if的用法 -->
+<div id="app-3">
+    <p v-if="seen">现在你看到我了</p>
+</div>
+<script>
+    var app3 = new Vue({
+        el: '#app-3',
+        data: {
+            seen: true
+        }
+    })
+</script>
+<hr/>
+
+<!-- v-for的用法 -->
+<div id="app-4">
+    <ol>
+        <li v-for="todo in todos">
+            {{ todo.text }}
+        </li>
+    </ol>
+</div>
+
+<script>
+    var app4 = new Vue({
+        el: '#app-4',
+        data: {
+            todos: [
+                { text: '学习 JavaScript' },
+                { text: '学习 Vue' },
+                { text: '整个牛项目' }
+            ]
+        }
+    })
+</script>
+<hr/>
+
+<!-- v-on 的用法-->
+<div id="app-5">
+    <p>{{ message }}</p>
+    <button v-on:click="reverseMessage">逆转消息</button>
+</div>
+
+<script>
+    var app5 = new Vue({
+        el: '#app-5',
+        data: {
+            message: 'Hello Vue.js!'
+        },
+        methods: {
+            reverseMessage: function () {
+                this.message = this.message.split('').reverse().join('')
+            }
+        }
+    })
+</script>
+<hr/>
+
+<!-- v-model的用法， 在输入控件和显示控件之间建立联系， 其实是输入控件到环境变量的数据流向。 -->
+<div id="app-6">
+    <p>{{ message }}</p>
+    <input v-model="message">
+</div>
+<script>
+    var app6 = new Vue({
+        el: '#app-6',
+        data: {
+            message: 'Hello Vue!'
+        }
+    })
+</script>
+<hr/>
+
+<!-- 自定义组件的用法。
+    item可以认为是上层定义的循环变量.
+    而todo可以认为是组件内部使用的循环变量， 这样实现了组件内部和上层之间的解耦。
+    组件的props属性定义了组件和它的容器之间的数据接口。
+-->
+<div id="app-7">
+    <ol>
+        <!-- 现在我们为每个todo-item提供待办项对象    -->
+        <!-- 待办项对象是变量，即其内容可以是动态的 -->
+        <todo-item v-for="item in groceryList" v-bind:todo="item"></todo-item>
+    </ol>
+</div>
+
+<script>
+    Vue.component('todo-item', {
+        props: ['todo'],
+        template: '<li>{{ todo.text }}</li>'
+    })
+    var app7 = new Vue({
+        el: '#app-7',
+        data: {
+            groceryList: [
+                { text: '蔬菜' },
+                { text: '奶酪' },
+                { text: '随便其他什么人吃的东西' }
+            ]
+        }
+    })
+</script>
+<hr/>
+
+<!-- v-bind在组件的定义中是有特殊作用的。即传递一个环境变量给组件内部使用。 -->
+<div id="app-8">
+    <!--<span v-bind:s="v1">{{s}}-{{v1}}</span>-->
+    <span v-bind:s="v1">123123-{{v1}} 33 </span>
+</div>
+
+<script>
+    var app8=new Vue({
+        el:'#app-8',
+        data:{
+            v1:'ddd'
+        }
+    })
+</script>
+
+
+</body>
+</html>
