@@ -111,16 +111,23 @@
 <div id="app-6">
     <p>{{ message }}</p>
     <input v-model="message">
+
+    <select v-model="sel">
+        <option>DBT1</option>
+    </select>
 </div>
 <script>
     var app6 = new Vue({
         el: '#app-6',
         data: {
-            message: 'Hello Vue!'
+            message: 'Hello Vue!',
+            sel:'DBT2'
         }
     })
 </script>
 <hr/>
+
+
 
 <!-- 自定义组件的用法。
     item可以认为是上层定义的循环变量.

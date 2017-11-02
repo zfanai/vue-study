@@ -3,3 +3,5 @@ Settings-->Editor-->Inspections-->XML-->Unbound XML namespace prefix
 
 学习路线
 官网教程：cn.vuejs.org
+
+官网教程中文版很值得经常看， 相关的知识都提到。

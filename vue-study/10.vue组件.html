@@ -5,6 +5,7 @@
 </head>
 <body>
 
+<p>全局组件和局部组件</p>
 <div id="example">
     <my-component></my-component>
 </div>
@@ -65,6 +66,7 @@
  props down, events up
  -->
 
+<p>父组件通过props定义的属性来传递数据给子组件</p>
 <!--
 v-bind:message2="a"
 -->
@@ -97,6 +99,262 @@ v-bind:message2="a"
 <hr/>
 
 <!-- 子组件通过事件来通知父组件内部状态的变化。 -->
+<p>子组件通过事件来通知父组件内部状态的变化。</p>
+<div id="counter-event-example">
+    <p>{{total}}</p>
+    <!-- inc-evt是自定义的事件，  incrementTotal是父组件对这个事件的处理函数 -->
+    <button-counter v-on:inc-evt="incrementTotal"></button-counter>
+    <button-counter v-on:inc-evt="incrementTotal"></button-counter>
+</div>
+
+<script type="text/javascript">
+    Vue.component('button-counter', {
+        template:'<button v-on:click=increment>{{counter}}</button>',
+        data:function(){
+            return {
+                counter:0
+            }
+        },
+        methods:{
+            // 这个是组件内部使用的方法， v-on:click使用的方法
+            increment:function () {
+                this.counter += 1;
+                this.$emit('inc-evt');
+            }
+        }
+    })
+
+    new Vue({
+        el:'#counter-event-example',
+        data:{
+            total:0
+        },
+        methods:{
+            incrementTotal:function(){
+                this.total += 1;
+            }
+        }
+    })
+</script>
+<hr/>
+
+<p>双向数据绑定</p>
+<div id="sync-example">
+    <p>{{bar}}</p>
+    <!-- sync只是语法糖， 其实相当于定义了一个update:foo事件处理函数 -->
+    <comp :foo.sync="bar"></comp>  <!-- 报avoid mutating错误 -->
+</div>
+<script type="text/javascript">
+    Vue.component('comp', {
+        props:['foo'],
+        template:'<button @click="add">{{foo}}</button>',
+        data:function () {
+            return {
+                //foo:2
+                a:2
+            }
+        },
+        // methods可以是对象， 不同的实例的方法都是一样的，所以可以直接用对象
+        methods:{
+            add:function () {
+                //this.foo += 1;  // 会被认为是直接修改父组件属性。
+
+                this.$emit('update:foo', this.a ++)
+            }
+        }
+    })
+    new Vue({
+        el:'#sync-example',
+        data:function () {
+            return {
+                'bar':3
+            }
+        }
+    })
+</script>
+<hr/>
+
+<p>Vue实例的钩子，回调函数 ， 这个内容应该在Vue实例里面写的。</p>
+<div id="vue-instance-example">
+
+</div>
+
+<script type="text/javascript">
+new Vue({
+    el:'#vue-instance-example',
+    data:function(){
+        return {a:2}
+    },
+    created:function(){
+        console.info('vue instance created');
+    }
+})
+</script>
+<hr/>
+
+<p>同级组件之间的通信</p>
+<div id="comp-comm-example">
+    <comp-a a="1"></comp-a>
+    <comp-b b="2"></comp-b>
+</div>
+<script type="text/javascript">
+    var bus=new Vue();
+    Vue.component('comp-a', {
+        props:['a'],
+        template:'<button @click="add">{{a}}</button>',
+        methods:{
+            add:function () {
+                console.info('a click')
+                bus.$emit('a-add', 1);
+            }
+        }
+    })
+
+    Vue.component('comp-b', {
+        props:['b'],
+        template:'<button>{{b}}{{c}}</button>',
+        data:function(){
+            return {
+                c:2
+            }
+        },
+        created:function(){
+            console.info('comp b created:'+this.b);
+
+            var that=this;      // 这个是解决方案。
+            bus.$on('a-add', function (id) {
+                that.c += 'x';
+            })
+
+            //bus.$on('a-add', function (id) {
+            //    console.info(id);
+            //    //this.b += 'x';
+            //    console.info(this.b);
+            //})
+
+            //bus.$on('a-add', msg=> {
+            //    this.b += 'x';   // 这个地方用箭头函数， 这里的this就是指的组件b了。 但是这个是ES6的内容， 浏览器无法直接识别。
+            //})
+        }
+    })
+
+    new Vue({
+        el:'#comp-comm-example',
+
+    })
+
+</script>
+<hr/>
+
+<p>slot的用法, 类似于jinja2里面的block功能</p>
+
+<div id="slot-example">
+    <h1>我是父组件的标题</h1>
+    <!--<my-slot-comp style="display:block;"> -->     <!-- 在纯HTML里面可以写，但是没有什么样式,写上內联样式也是起作用的 -->
+    <my-slot-comp>             <!-- 如果在Vue内部，是报错的，必须要注册成组件 -->
+        <p>这是一些初始内容</p>
+        <p>这是更过的初始内容</p>
+    </my-slot-comp>
+</div>
+
+<script type="text/javascript">
+ new Vue({
+     el:'#slot-example',
+     components:{
+         /**/'my-slot-comp':{
+             template:'<div>'+
+             '<h2>我是子组件的标题</h2>'+
+             '<slot>只有在没有要分发的内容时才显示</slot>'+   // slot可以用，具有特殊性， 已是Vue制定的协议
+             //'<slot2>dd</slot2>'+      // 在Vue里面是不能用的， 除非已经注册了slot2组件
+             //'<my-comp>ddd</my-comp>'+ // 同上
+             '</div>'
+         }
+
+         /*
+         'my-slot-comp':{
+             template:'<div>dd</div>'
+         }*/
+     }
+ })
+</script>
+
+<!--
+<div>
+    <h2>我是子组件的标题</h2>
+    <slot>只有在没有要分发的内容时才显示</slot>
+    <slot2>dd</slot2>
+    <my-comp>ddd</my-comp>
+</div>
+-->
+<hr/>
+
+<p>具名slot, 命名的slot, 是的组件的模板也有一些参数化的功能。</p>
+<div id="named-slot">
+    <!-- 自定义组件也可以写一些子标签， slot就是自定义组件的子标签和它的模板标签树之间的对应关系。
+        如果自定义组件的模板没有定义slot标签， 那么它的子标签是不会渲染出来的。
+    -->
+    <app-layout>
+        <h1 slot="header">这里可能是一个页面标题1</h1>
+        <!-- 自定义组件的slot就相当于是jinja2里面的宏，不对，不是宏， 还是想extends模板继承的功能 -->
+        <p>主要内容的一个段落</p>
+        <p>另一个段落</p>
+        <p slot="footer">这里有一些联系信息</p>
+    </app-layout>
+</div>
+
+<script type="text/x-template" id="app-layout-tpl">
+    <div class="container">
+        <header>
+            <slot name="header"></slot>
+        </header>
+
+        <main><slot></slot></main>
+
+        <footer>
+            <slot name="footer"></slot>
+        </footer>
+    </div>
+</script>
+
+<script type="text/javascript">
+new Vue({
+    el:'#named-slot',
+    components:{
+        'app-layout':{
+            template:'#app-layout-tpl'
+        }
+    }
+})
+</script>
+<hr/>
+
+<p>作用域插槽, 有点类似从组件模板向组件标签中传递数据， 在组件标签中再定义template标签用作模板</p>
+<div id="scope-slot">
+<div class="parent">
+    <!-- 组件模板slot标签， 组件子标签有template标签， temlate的内容会被替换slot标签, 但是可以传递slot标签的内容到template便签里面去
+        有点类似具名slot的功能。 template也可以指定slot属性，变成一个具名slot的应用， 只是可以用template包含的块来替换slot
+    -->
+    <scope-child>
+        <template xscope="data">
+            <span>hello from parent</span>
+        </template>
+    </scope-child>
+</div>
+</div>
+
+<script type="text/javascript">
+new Vue({
+    el:'#scope-slot',
+    components:{
+        'scope-child':{
+            template:'<div><slot d="we"></slot></div>'
+        }
+    }
+})
+</script>
+<hr/>
+
+<p>动态组件</p>
 
 
 
