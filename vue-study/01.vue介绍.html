@@ -32,7 +32,7 @@
 如果元素的属性要要vue的环境变量， 要使用v-bind指令。
  -->
 <div id="app-2">
-  <span v-bind:title2="message" title='{{v}}'>
+  <span v-bind:title="message" title2='x{x{v}x}'>
     鼠标悬停几秒钟查看此处动态绑定的提示信息！{{v}}
   </span>
 </div>
@@ -160,7 +160,9 @@
 </script>
 <hr/>
 
-<!-- v-bind在组件的定义中是有特殊作用的。即传递一个环境变量给组件内部使用。 -->
+<!-- v-bind在组件的定义中是有特殊作用的。即传递一个环境变量给组件内部使用。
+但在app-8中不是定义自定义组件， 普通的应用场景是给一个属性绑定一个变量。
+-->
 <div id="app-8">
     <!--<span v-bind:s="v1">{{s}}-{{v1}}</span>-->
     <span v-bind:s="v1">123123-{{v1}} 33 </span>

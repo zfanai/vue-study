@@ -73,14 +73,17 @@ v-bind:message2="a"
 <div id="example-3">
 <!--<child v-for="f in fruits" v-bind:message="f"></child> -->
     <child v-bind:message="f" message2="minus"></child>    <!-- 用变量申明一个组件 -->
-    <child message="pear" message2="add"></child>   <!-- 用常量申明一个组件 -->   <!-- message是协议接口 -->
+    <child message3="pear" message2="add"></child>   <!-- 用常量申明一个组件 -->   <!-- message是协议接口 -->
     <!-- 用常量传递的是字符串，如果想传递数值，使用动态变量传递属性 -->
 </div>
 
+<!-- 如果把组件看出一个函数的话， props定义的是函数的参数列表.
+props 定义的就是组件内部的环境变量， 可以不用在data里面定义的数据
+ -->
 <script type="text/javascript">
     Vue.component('child', {
         props:['message', ],
-        template:'<span>{{message}}{{a}}</span>',
+        template:'<span>{{message}}-{{a}}-{{message}}</span>',
         data:function(){
             return {a:2}
         }
@@ -98,7 +101,9 @@ v-bind:message2="a"
 </script>
 <hr/>
 
-<!-- 子组件通过事件来通知父组件内部状态的变化。 -->
+<!-- 子组件通过事件来通知父组件内部状态的变化。
+父组件来监测子组件内部的事件。
+-->
 <p>子组件通过事件来通知父组件内部状态的变化。</p>
 <div id="counter-event-example">
     <p>{{total}}</p>
@@ -247,13 +252,17 @@ new Vue({
 <hr/>
 
 <p>slot的用法, 类似于jinja2里面的block功能</p>
-
+<!--
+父组件调用子组件， 相当于是调用子组件， 子组件里面的内容用分发给子组件模板， 来生成实际的子组件的内容，
+而这部分内容将用来替换子组件模板里面的slot标签的内容。
+-->
 <div id="slot-example">
     <h1>我是父组件的标题</h1>
     <!--<my-slot-comp style="display:block;"> -->     <!-- 在纯HTML里面可以写，但是没有什么样式,写上內联样式也是起作用的 -->
     <my-slot-comp>             <!-- 如果在Vue内部，是报错的，必须要注册成组件 -->
+        <!--
         <p>这是一些初始内容</p>
-        <p>这是更过的初始内容</p>
+        <p>这是更过的初始内容</p> -->
     </my-slot-comp>
 </div>
 
@@ -289,6 +298,7 @@ new Vue({
 <hr/>
 
 <p>具名slot, 命名的slot, 是的组件的模板也有一些参数化的功能。</p>
+<!-- 在模板求值阶段传递一些参数。 -->
 <div id="named-slot">
     <!-- 自定义组件也可以写一些子标签， slot就是自定义组件的子标签和它的模板标签树之间的对应关系。
         如果自定义组件的模板没有定义slot标签， 那么它的子标签是不会渲染出来的。
@@ -334,11 +344,20 @@ new Vue({
     <!-- 组件模板slot标签， 组件子标签有template标签， temlate的内容会被替换slot标签, 但是可以传递slot标签的内容到template便签里面去
         有点类似具名slot的功能。 template也可以指定slot属性，变成一个具名slot的应用， 只是可以用template包含的块来替换slot
     -->
+
+    <!--
     <scope-child>
         <template xscope="data">
             <span>hello from parent</span>
         </template>
+    </scope-child> -->
+    <template><div>123</div></template>
+    <scope-child>
+
+            <span>hello from parent</span>
+
     </scope-child>
+
 </div>
 </div>
 
@@ -352,6 +371,60 @@ new Vue({
     }
 })
 </script>
+<hr/>
+
+
+
+<div id="scoped-slot-example">
+<div class="parent">
+    <child>
+        <template scope="props">
+            <span>hello from parent</span>
+            <!----><span>{{ props.text }}</span>
+        </template>
+    </child>
+</div>
+</div>
+
+<script type="text/javascript">
+    new Vue({
+        el:'#scoped-slot-example',
+        components:{
+            'child':{
+                template:'<div class="child"> <slot text="hello from child"></slot> </div>'
+            }
+        }
+    })
+</script>
+<hr/>
+
+<p>嵌套组件</p>
+<div id="nest-comp-example">
+<div class="wrap">
+    <out-child>
+        <div>out child</div>
+        <inner-child>
+            <span>123</span>
+        </inner-child>
+    </out-child>
+</div>
+</div>
+
+<script type="text/javascript">
+    new Vue({
+        el:'#nest-comp-example',
+        components:{
+            'out-child':{
+                template:'<div class="child1"> <slot text="hello from child"></slot> </div>'
+            },
+
+            'inner-child':{
+                template:'<div class="child2"> <slot text="hello from child"></slot> </div>'
+            }
+        }
+    })
+</script>
+
 <hr/>
 
 <p>动态组件</p>
